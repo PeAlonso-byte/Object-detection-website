@@ -2,7 +2,7 @@ import React from 'react'
 
 type Props = {}
 
-const ImageClassification = (props: Props) => {
+const ImageClassificationPage = (props: Props) => {
     return (
         <div>
 
@@ -10,4 +10,4 @@ const ImageClassification = (props: Props) => {
     )
 }
 
-export default ImageClassification
+export default ImageClassificationPage
