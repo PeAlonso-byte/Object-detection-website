@@ -1,9 +1,12 @@
 "use client";
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import axios from 'axios'
+import Image from "next/image"
 import { ImageIcon, Loader2, ScanSearch } from 'lucide-react'
 import React, { useState } from 'react'
+import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 
 type Props = {}
@@ -38,6 +41,15 @@ const ImageClassificationPage = (props: Props) => {
                     }
                 </Button>
             </form>
+            { url && (<>
+                <Image src={url} width={400} height={400} alt={'uploaded image'} />
+                <Link className={cn( buttonVariants( { variant: "ghost"}), 'text-xs text-muted-foreground')}
+                    href={url}/>
+            </>
+            )}
+            {
+                label && <p className='font-bold text-l'>Detected: {label}</p>
+            }
         </main>
     )
 
