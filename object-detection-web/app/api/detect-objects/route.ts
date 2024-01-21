@@ -1,4 +1,6 @@
 import { utapi } from '@/utils/uploadthing'
+import { pipeline } from '@xenova/transformers';
+
 
 export async function POST( req: Request, res: Response) {
 
@@ -9,5 +11,16 @@ export async function POST( req: Request, res: Response) {
     const responseData = response[0].data
     const url = responseData?.url
 
+    console.log(url)
+
+    /** Detect objects with a local model */
+
+    const detector = await pipeline('object-detection', 'Xenova/detr-resnet-50');
+    const output = await detector(url!);
+
+    console.log(output)
+    
     return new Response("dummy response", {status: 200}) 
+
+
 }
