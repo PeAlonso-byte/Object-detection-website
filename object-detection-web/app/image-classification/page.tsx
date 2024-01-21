@@ -61,6 +61,9 @@ const ImageClassificationPage = (props: Props) => {
         setLoading(true)
         const response = await axios.post("/api/detect-objects", formData)
         setLoading(false)
+
+        setUrl(response.data.url)
+        setLabel(response.data.label)
     }
 }
 

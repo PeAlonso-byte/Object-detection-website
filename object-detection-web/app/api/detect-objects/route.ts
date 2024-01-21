@@ -19,8 +19,25 @@ export async function POST( req: Request, res: Response) {
     const output = await detector(url!);
 
     console.log(output)
+
+    /** Parse output */
+
+    const dictionaryObjects : { [key: string] : number} = {}
     
-    return new Response("dummy response", {status: 200}) 
+    output.forEach(({score, label} : any) => {
+        if (score > 0.85) {
+            if (dictionaryObjects[label]) {
+                dictionaryObjects[label]++
+            } else {
+                dictionaryObjects[label] = 1
+            }
+        }
+    });
+    return new Response(JSON.stringify({
+        url: url,
+        label: JSON.stringify(dictionaryObjects),
+        
+    }), {status: 200}) 
 
 
 }
