@@ -4,9 +4,13 @@ import { pipeline } from '@xenova/transformers';
 
 export async function POST( req: Request, res: Response) {
 
+    console.log(req)
     const formData = await req.formData()
+    console.log(formData)
     const files = formData.getAll('files')
+    console.log(files)
     const response = await utapi.uploadFiles(files)
+    console.log(response)
 
     const responseData = response[0].data
     const url = responseData?.url
