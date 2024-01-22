@@ -17,12 +17,12 @@ const ImageClassificationPage = (props: Props) => {
     const [label, setLabel] = useState("")
     const [loading, setLoading ] = useState<boolean>(false)
     const [image, setImage] : any = useState(null)
-    var xmin:number = 227/400
-    var ymin:number = 128/400
-    var xmax:number = 3050/400
-    var ymax:number = 3574/400
+    var xmin:number = 102
+    var ymin:number = 84
+    var xmax:number = 172
+    var ymax:number = 206
     return (
-        <main className='
+        <main id="test" className='
         flex
         flex-col
         items-center
@@ -69,18 +69,76 @@ const ImageClassificationPage = (props: Props) => {
     )
 
     /** Handler functions */
-
+    
     async function uploadFiles (event : any) {
         event.preventDefault()
-        
+        const file = event.target[0].files[0]
+        console.log(file.size)
+        const url = URL.createObjectURL(file)
+
+        const img = new (window as any).Image()
+        img.src = url
+
+        img.onload = function () {
+            const maxWidth:number   = 400
+            const maxHeight:number  = 400
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+
+            const ratio = Math.min(maxWidth / img.width, maxHeight / img.height)
+            const width = img.width * ratio + .5 | 0
+            const height = img.height * ratio + .5 | 0
+
+            canvas.width = width
+            canvas.height = height
+
+            ctx?.drawImage(img, 0, 0, width, height)
+            document.body.appendChild(canvas)
+
+            canvas.toBlob(async (blob) => {
+                const fr = new FileReader()
+                fr.readAsDataURL(blob!)
+                const file = new File([blob!], "capture.jpg", {
+                    type: 'image/jpeg'
+                });
+                var fd = new FormData();
+                fd.append("files", file);
+                setLoading(true)
+                const response = await axios.post("/api/detect-objects", fd)
+                setLoading(false)
+
+                setUrl(response.data.url)
+                setLabel(response.data.label)
+            }, 'image/png', 1)
+        }
+
+                    /*fetch(dataurl).then(res => res.blob()).then(async blob => {
+                        const file = new File([blob], "capture.jpg", {
+                            type: 'image/jpg'
+                        });
+                        var fd = new FormData();
+                        fd.append("files", file);
+                        setLoading(true)
+                        const response = await axios.post("/api/detect-objects", fd)
+                        setLoading(false)
+
+                        setUrl(response.data.url)
+                        setLabel(response.data.label)
+                    })/*
+
+                    
+
+        /** ######################## */
         const formData = new FormData(event.target)
         
-        setLoading(true)
+        
+        /*setLoading(true)
         const response = await axios.post("/api/detect-objects", formData)
         setLoading(false)
 
         setUrl(response.data.url)
         setLabel(response.data.label)
+        */
     }
 
 
