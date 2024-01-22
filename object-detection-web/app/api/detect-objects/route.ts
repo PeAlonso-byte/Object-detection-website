@@ -26,19 +26,25 @@ export async function POST( req: Request, res: Response) {
     /** Parse output */
 
     const dictionaryObjects : { [key: string] : number} = {}
-    
-    output.forEach(({score, label} : any) => {
+    const boxDictionary : { name: string, coord: any }[] = []
+    output.forEach(({score, label, box} : any) => {
         if (score > 0.85) {
             if (dictionaryObjects[label]) {
                 dictionaryObjects[label]++
+                
             } else {
                 dictionaryObjects[label] = 1
+                
+                
             }
+            boxDictionary.push({name: label, coord:box}) 
         }
+        
     });
     return new Response(JSON.stringify({
         url: url,
         label: JSON.stringify(dictionaryObjects),
+        box: JSON.stringify(boxDictionary),
         
     }), {status: 200}) 
 
