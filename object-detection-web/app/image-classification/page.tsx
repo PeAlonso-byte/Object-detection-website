@@ -155,7 +155,10 @@ const ImageClassificationPage = (props: Props) => {
         var svgns = "http://www.w3.org/2000/svg";
         var rect = document.createElementNS(svgns, 'rect');
         const array = JSON.parse(box)
-        console.log(svg)
+        const unique = [...new Set(array.map(item => item.name))];
+        unique.forEach(function (element : any) {
+            // Calculate random color for each element
+          });
         array.map((box: any) => {
             
             var newRect = document.createElementNS(svgns, 'rect');
@@ -166,7 +169,7 @@ const ImageClassificationPage = (props: Props) => {
             newRect.setAttribute('y', box.coord.ymin)
             newRect.setAttribute('width', width)
             newRect.setAttribute('height', height)
-            newRect.setAttribute('className', 'fill-red-950 stroke-3 stroke-black')
+            newRect.setAttribute('class', 'fill-red-950 stroke-3 stroke-red opacity-60  bg-red-950 z-99')
             console.log(newRect)
             svg!.appendChild(newRect)
         })
