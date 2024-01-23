@@ -4,12 +4,16 @@ import { Input } from '@/components/ui/input'
 import axios from 'axios'
 import Image from "next/image"
 import { ImageIcon, Loader2, ScanSearch } from 'lucide-react'
-import React, { useState } from 'react'
+import React, { createElement, useState } from 'react'
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 
 type Props = {}
+type BoxProps = {
+    name: string,
+    coord: any
+}[]
 
 const ImageClassificationPage = (props: Props) => {
 
@@ -17,6 +21,7 @@ const ImageClassificationPage = (props: Props) => {
     const [label, setLabel] = useState("")
     const [loading, setLoading ] = useState<boolean>(false)
     const [image, setImage] : any = useState(null)
+    var box : any = null
     var xmin:number = 102
     var ymin:number = 84
     var xmax:number = 172
@@ -49,8 +54,6 @@ const ImageClassificationPage = (props: Props) => {
                 <div className='relative'>
                     <Image src={url} width={400} height={400} alt={'uploaded image'} /> 
                     <svg className='absolute top-0 left-0 w-full h-full z-10 opacity-60' width="400" height="400" viewBox="0 0 400 400" id="draw" xmlns="http://www.w3.org/2000/svg"> 
-                        <rect x={xmin} y={ymin} width={xmax-xmin} height={ymax-ymin} className='fill-red-950 stroke-3 stroke-black'></rect>
-                    
                     </svg>
                 </div>
                 <Link className={cn( buttonVariants( { variant: "ghost"}), 'text-xs text-muted-foreground')}
@@ -62,7 +65,6 @@ const ImageClassificationPage = (props: Props) => {
             }
             <button onClick={() => {
                 var input = document.getElementById("inp");
-                console.log(image)
 
             }}>Testeo puntos</button>
         </main>
@@ -103,11 +105,18 @@ const ImageClassificationPage = (props: Props) => {
                 });
                 var fd = new FormData();
                 fd.append("files", file);
+
+
                 setLoading(true)
                 const response = await axios.post("/api/detect-objects", fd)
                 setLoading(false)
-                console.log(response.data.label)
+
+
                 setUrl(response.data.url)
+                box = response.data.box
+                setTimeout(() => {
+                    drawBoxes(box) 
+                }, 1000)
                 setLabel(response.data.label)
             }, 'image/png', 1)
         }
@@ -141,6 +150,27 @@ const ImageClassificationPage = (props: Props) => {
         */
     }
 
+    function drawBoxes (box : BoxProps | any) : void {
+        const svg = document.getElementById("draw")
+        var svgns = "http://www.w3.org/2000/svg";
+        var rect = document.createElementNS(svgns, 'rect');
+        const array = JSON.parse(box)
+        console.log(svg)
+        array.map((box: any) => {
+            
+            var newRect = document.createElementNS(svgns, 'rect');
+            var width : string  = String(box.coord.xmax - box.coord.xmin)
+            var height : string  = String(box.coord.ymax-box.coord.ymin)
+
+            newRect.setAttribute('x', box.coord.xmin)
+            newRect.setAttribute('y', box.coord.ymin)
+            newRect.setAttribute('width', width)
+            newRect.setAttribute('height', height)
+            newRect.setAttribute('className', 'fill-red-950 stroke-3 stroke-black')
+            console.log(newRect)
+            svg!.appendChild(newRect)
+        })
+    }
 
     
 
