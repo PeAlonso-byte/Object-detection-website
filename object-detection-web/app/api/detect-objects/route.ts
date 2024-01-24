@@ -1,9 +1,8 @@
 import { utapi } from '@/utils/uploadthing'
 import { pipeline } from '@xenova/transformers';
-
+import { useEffect, useState } from 'react';
 
 export async function POST( req: Request, res: Response) {
-
 
     const formData = await req.formData()
 
@@ -26,7 +25,7 @@ export async function POST( req: Request, res: Response) {
     /** Parse output */
 
     const dictionaryObjects : { [key: string] : number} = {}
-    const boxDictionary : { name: string, coord: any }[] = []
+    const boxDictionary : { name: string, coord: any, color:string|null }[] = []
     output.forEach(({score, label, box} : any) => {
         if (score > 0.85) {
             if (dictionaryObjects[label]) {
@@ -37,7 +36,7 @@ export async function POST( req: Request, res: Response) {
                 
                 
             }
-            boxDictionary.push({name: label, coord:box}) 
+            boxDictionary.push({name: label, coord:box, color:null}) 
         }
         
     });
