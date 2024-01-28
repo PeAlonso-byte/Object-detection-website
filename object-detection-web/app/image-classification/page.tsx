@@ -18,13 +18,15 @@ type BoxProps = {
 const ImageClassificationPage = (props: Props) => {
 
     const [url, setUrl] = useState("")
+    const [height, setHeight] = useState(0)
+    const [width, setWidth] = useState(0)
     const [label, setLabel] = useState("")
     const [loading, setLoading ] = useState<boolean>(false)
     const [image, setImage] : any = useState(null)
     const [colors, setColors] : any = useState([])
 
     useEffect(() => {
-        setColors(['red', 'purple', 'pink', 'blue', 'yellow', 'orange', 'green', 'lime'])
+        setColors(['red', 'purple', 'hotpink', 'blue', 'yellow', 'orange', 'green'])
     }, [])
 
     var box : any = null
@@ -39,7 +41,10 @@ const ImageClassificationPage = (props: Props) => {
         items-center
         justify-start
         p-24
-        gap-2'
+        gap-2
+        overflow-x-scroll
+        w-full
+        h-full'
         >
             <form className='
             flex
@@ -57,11 +62,8 @@ const ImageClassificationPage = (props: Props) => {
                 </Button>
             </form>
             { url && (<>
-                <div className='relative'>
-                    <Image src={url} width={400} height={400} alt={'uploaded image'} /> 
-                    <svg className='absolute top-0 left-0 w-full h-full z-10 opacity-90 bg-transparent fill-transparent' width="400" height="400" viewBox="0 0 400 400" id="draw" xmlns="http://www.w3.org/2000/svg"> 
-
-                    </svg>
+                <div id="draw" className='relative w-full h-full'>
+                    <Image src={url} width={width} height={height} alt={'uploaded image'} /> 
                 </div>
                 <Link className={cn( buttonVariants( { variant: "ghost"}), 'text-xs text-muted-foreground')}
                     href={url}/>
@@ -77,87 +79,74 @@ const ImageClassificationPage = (props: Props) => {
     
     async function uploadFiles (event : any) {
         event.preventDefault()
-        const rect = document.querySelectorAll('rect').forEach(e => e.remove())
+        const svg = document.getElementById("draw")
+        document.querySelectorAll('[name="boxes"]').forEach(e => e.remove())
         const file = event.target[0].files[0]
         const url = URL.createObjectURL(file)
 
         const img = new (window as any).Image()
         img.src = url
-
-        img.onload = function () {
-            const maxWidth:number   = 400
-            const maxHeight:number  = 400
-            const canvas = document.createElement('canvas')
-            const ctx = canvas.getContext('2d')
-
-            const ratio = Math.min(maxWidth / img.width, maxHeight / img.height)
-            const width = img.width * ratio + .5 | 0
-            const height = img.height * ratio + .5 | 0
-
-            canvas.width = width
-            canvas.height = height
-
-            ctx?.drawImage(img, 0, 0, width, height)
-            document.body.appendChild(canvas)
-
-            canvas.toBlob(async (blob) => {
-                const fr = new FileReader()
-                fr.readAsDataURL(blob!)
-                const file = new File([blob!], "capture.jpg", {
-                    type: 'image/jpeg'
-                });
-                var fd = new FormData();
-                fd.append("files", file);
-
-
-                setLoading(true)
-                const response = await axios.post("/api/detect-objects", fd)
-                setLoading(false)
-
-
-                setUrl(response.data.url)
-                box = response.data.box
-                setTimeout(() => {
-                    drawBoxes(box) 
-                }, 1000)
-                setLabel(response.data.label)
-            }, 'image/png', 1)
+        
+        const formData = new FormData(event.target)
+        
+        img.onload = async function () {
+            
+            setLoading(true)
+            const response = await axios.post("/api/detect-objects", formData)
+            setLoading(false)
+            
+            setWidth(img.width)
+            setHeight(img.height)
+            setUrl(response.data.url)
+            setLabel(response.data.label)
+            box = response.data.box
+            console.log(response.data)
+            setTimeout(() => {
+                drawBoxes(box) 
+            }, 1000)
         }
         
     }
 
-    function drawBoxes (box : BoxProps | any) : void {
-        setColors(['red', 'purple', 'pink', 'blue', 'sky', 'cyan', 'green', 'lime']) 
+    function drawBoxes (box : any) : void {
+        setColors(['red', 'purple', 'hotpink', 'blue', 'cyan', 'green', 'orange']) 
         const svg = document.getElementById("draw")
         var svgns = "http://www.w3.org/2000/svg"
+        console.log(box)
         const array = JSON.parse(box)
-        const m = new Map(array.map(pos => [pos.name, pos]));
-        const uniques = [...m.values()];
-        uniques.map((element : any) => {
-            var index = Math.round(Math. random()*colors.length)
-            element.color=colors[index]
-        })
-        /*array.forEach(function (element : any) {
-            // Calculate random color for each element
-            
-            element.color = colors[Math.round(Math. random()*colors.length)]
-          });*/
-        console.log(uniques)
+        
+        console.log(array)
         array.map((box: any) => {
-            
-            var newRect = document.createElementNS(svgns, 'rect');
-            var width : string  = String(box.coord.xmax - box.coord.xmin)
-            var height : string  = String(box.coord.ymax-box.coord.ymin)
-            var color :any = uniques.find((o : any) => o.name === box.name);
-            newRect.setAttribute('x', box.coord.xmin)
-            newRect.setAttribute('y', box.coord.ymin)
-            newRect.setAttribute('width', width)
-            newRect.setAttribute('height', height)
-            newRect.setAttribute('name', 'boxes')
-            newRect.setAttribute('style', `fill: ${color.color}; fill-opacity:20%; border: 10px; stroke: red; `)
-            //newRect.setAttribute('class', `fill-${color.color}-950`)
-            console.log(newRect)
-            svg!.appendChild(newRect)
+            const color =
+            "#" +
+            Math.floor(Math.random() * 0xffffff)
+              .toString(16)
+              .padStart(6, '0');
+
+            console.log(color)
+            const boxElement = document.createElement("div");
+            boxElement.setAttribute("name", "boxes")
+            Object.assign(boxElement.style, {
+                zIndex: "99",
+                borderWidth: "2px",
+                borderStyle: "solid",
+                borderColor: color,
+                left: 100 * box.coord.xmin + "%",
+                top: 100 * box.coord.ymin + "%",
+                width: 100 * (box.coord.xmax - box.coord.xmin) + "%",
+                height: 100 * (box.coord.ymax - box.coord.ymin) + "%",
+                position: "absolute"
+            });
+            const labelElement = document.createElement("span");
+            labelElement.textContent = box.name + " " + (box.score * 100).toFixed(2) + "%";
+            labelElement.style.backgroundColor = color;
+            labelElement.style.color = "white";
+            labelElement.style.zIndex = "99";
+            labelElement.setAttribute("name", "boxes")
+
+            boxElement.appendChild(labelElement);
+
+            svg?.appendChild(boxElement)
         })
     }
 
