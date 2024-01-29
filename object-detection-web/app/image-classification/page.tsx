@@ -42,7 +42,6 @@ const ImageClassificationPage = (props: Props) => {
         justify-start
         p-24
         gap-2
-        overflow-x-scroll
         w-full
         h-full'
         >
@@ -62,7 +61,7 @@ const ImageClassificationPage = (props: Props) => {
                 </Button>
             </form>
             { url && (<>
-                <div id="draw" className='relative w-full h-full'>
+                <div id="draw" className='relative '>
                     <Image src={url} width={width} height={height} alt={'uploaded image'} /> 
                 </div>
                 <Link className={cn( buttonVariants( { variant: "ghost"}), 'text-xs text-muted-foreground')}
