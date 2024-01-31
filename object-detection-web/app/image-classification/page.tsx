@@ -69,7 +69,7 @@ const ImageClassificationPage = (props: Props) => {
             </>
             )}
             {
-                label && <p className='font-bold text-l'>Detected: {label}</p>
+                label && <p className='font-bold text-l text-green-600'>{label}</p>
             }
         </main>
     )
@@ -97,9 +97,8 @@ const ImageClassificationPage = (props: Props) => {
             setWidth(img.width)
             setHeight(img.height)
             setUrl(response.data.url)
-            setLabel(response.data.label)
+            setLabel(formatLabel(response.data.label))
             box = response.data.box
-            console.log(response.data)
             setTimeout(() => {
                 drawBoxes(box) 
             }, 1000)
@@ -107,11 +106,28 @@ const ImageClassificationPage = (props: Props) => {
         
     }
 
+    function formatLabel(label : string) : string {
+        const fLabel = JSON.parse(label)
+        let obj = Object.keys(fLabel)
+        var labelFinal = ''
+        var count = 0
+
+        obj.forEach((label) => {
+            if (count == 0) {
+                labelFinal += `${fLabel[label] == 1 ? 'There is' : 'There are '} ${fLabel[label]} ${label}`
+            } else {
+                labelFinal += `, ${fLabel[label]} ${label}`
+            }
+            count+=1
+        })
+
+        return labelFinal;
+    }
+
     function drawBoxes (box : any) : void {
         setColors(['red', 'purple', 'hotpink', 'blue', 'cyan', 'green', 'orange']) 
         const svg = document.getElementById("draw")
         var svgns = "http://www.w3.org/2000/svg"
-        console.log(box)
         const array = JSON.parse(box)
         
         console.log(array)
@@ -121,8 +137,6 @@ const ImageClassificationPage = (props: Props) => {
             Math.floor(Math.random() * 0xffffff)
               .toString(16)
               .padStart(6, '0');
-
-            console.log(color)
             const boxElement = document.createElement("div");
             boxElement.setAttribute("name", "boxes")
             Object.assign(boxElement.style, {
