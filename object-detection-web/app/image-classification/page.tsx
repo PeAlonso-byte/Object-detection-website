@@ -103,6 +103,8 @@ const ImageClassificationPage = (props: Props) => {
                 drawBoxes(box) 
             }, 1000)
         }
+
+        addCanvas(event)
         
     }
 
@@ -161,6 +163,39 @@ const ImageClassificationPage = (props: Props) => {
 
             svg?.appendChild(boxElement)
         })
+    }
+
+    function addCanvas (event : any) {
+        const file = event.target[0].files[0]
+        const url = URL.createObjectURL(file)
+
+        const img = new (window as any).Image()
+        img.src = url
+
+        img.onload = function () {
+            const maxWidth:number   = 400
+            const maxHeight:number  = 400
+            const canvas = document.createElement('canvas')
+            const ctx = canvas.getContext('2d')
+
+            const ratio = Math.min(maxWidth / img.width, maxHeight / img.height)
+            const width = img.width * ratio + .5 | 0
+            const height = img.height * ratio + .5 | 0
+
+            canvas.width = width
+            canvas.height = height
+
+            ctx?.drawImage(img, 0, 0, width, height)
+            document.body.appendChild(canvas)
+
+            canvas.toBlob(async (blob) => {
+                const fr = new FileReader()
+                fr.readAsDataURL(blob!)
+                const file = new File([blob!], "capture.jpg", {
+                    type: 'image/jpeg'
+                });
+            }, 'image/png', 1)
+        }
     }
 
     
