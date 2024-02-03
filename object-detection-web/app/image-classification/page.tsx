@@ -71,6 +71,9 @@ const ImageClassificationPage = (props: Props) => {
             {
                 label && <p className='font-bold text-l text-green-600'>{label}</p>
             }
+
+            <div id="canvasH" className='relative gap-2'>
+            </div>
         </main>
     )
 
@@ -100,11 +103,11 @@ const ImageClassificationPage = (props: Props) => {
             setLabel(formatLabel(response.data.label))
             box = response.data.box
             setTimeout(() => {
-                drawBoxes(box) 
+                drawBoxes(box, true) 
             }, 1000)
         }
 
-        addCanvas(event)
+        //compressImageandAddCanvas(event)
         
     }
 
@@ -126,10 +129,9 @@ const ImageClassificationPage = (props: Props) => {
         return labelFinal;
     }
 
-    function drawBoxes (box : any) : void {
+    function drawBoxes (box : any, flag : boolean) : void {
         setColors(['red', 'purple', 'hotpink', 'blue', 'cyan', 'green', 'orange']) 
-        const svg = document.getElementById("draw")
-        var svgns = "http://www.w3.org/2000/svg"
+        const svg = flag ? document.getElementById("draw") : document.getElementById("canvasH")
         const array = JSON.parse(box)
         
         console.log(array)
@@ -165,9 +167,10 @@ const ImageClassificationPage = (props: Props) => {
         })
     }
 
-    function addCanvas (event : any) {
+    function compressImageandAddCanvas (event : any) {
         const file = event.target[0].files[0]
         const url = URL.createObjectURL(file)
+        const canvasH = document.getElementById("canvasH")
 
         const img = new (window as any).Image()
         img.src = url
@@ -184,9 +187,9 @@ const ImageClassificationPage = (props: Props) => {
 
             canvas.width = width
             canvas.height = height
-
+            canvas.setAttribute("class", "p-3")
             ctx?.drawImage(img, 0, 0, width, height)
-            document.body.appendChild(canvas)
+            canvasH?.appendChild(canvas)
 
             canvas.toBlob(async (blob) => {
                 const fr = new FileReader()
@@ -194,7 +197,24 @@ const ImageClassificationPage = (props: Props) => {
                 const file = new File([blob!], "capture.jpg", {
                     type: 'image/jpeg'
                 });
+                var fd = new FormData();
+                fd.append("files", file);
+
+
+                /*setLoading(true)
+                const response = await axios.post("/api/detect-objects", fd)
+                setLoading(false)
+
+
+                setUrl(response.data.url)
+                box = response.data.box
+                setTimeout(() => {
+                    drawBoxes(box ,false) 
+                }, 1000)
+                setLabel(response.data.label)
+                */
             }, 'image/png', 1)
+
         }
     }
 
