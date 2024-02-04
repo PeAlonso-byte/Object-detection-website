@@ -82,7 +82,12 @@ const ImageClassificationPage = (props: Props) => {
     async function uploadFiles (event : any) {
         event.preventDefault()
         const svg = document.getElementById("draw")
-        document.querySelectorAll('[name="boxes"]').forEach(e => e.remove())
+
+        if (svg) {
+            document.getElementById("draw")?.querySelectorAll('[name="boxes"]').forEach(e => e.remove())
+        } else {
+            document.querySelectorAll('[name="boxes"]').forEach(e => e.remove())
+        }
         const file = event.target[0].files[0]
         const url = URL.createObjectURL(file)
 
@@ -104,6 +109,7 @@ const ImageClassificationPage = (props: Props) => {
             box = response.data.box
             setTimeout(() => {
                 drawBoxes(box, true) 
+                addHistory()
             }, 1000)
         }
 
@@ -164,7 +170,20 @@ const ImageClassificationPage = (props: Props) => {
             boxElement.appendChild(labelElement);
 
             svg?.appendChild(boxElement)
+            
         })
+    }
+
+    function addHistory() {
+        const canvasH = document.getElementById("canvasH")
+        const imgClone = document.getElementById("draw")
+        var newImg = imgClone?.cloneNode(true)
+        var img = (newImg?.firstChild) as HTMLElement
+        img.setAttribute('width', '400')
+        img.setAttribute('height', '400')
+
+        canvasH?.append(newImg!)
+
     }
 
     function compressImageandAddCanvas (event : any) {
