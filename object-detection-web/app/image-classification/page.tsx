@@ -73,6 +73,7 @@ const ImageClassificationPage = (props: Props) => {
             }
 
             <div id="canvasH" className='relative gap-2'>
+                <div id="canvasV" className='flex gap-2'></div>
             </div>
         </main>
     )
@@ -137,7 +138,7 @@ const ImageClassificationPage = (props: Props) => {
 
     function drawBoxes (box : any, flag : boolean) : void {
         setColors(['red', 'purple', 'hotpink', 'blue', 'cyan', 'green', 'orange']) 
-        const svg = flag ? document.getElementById("draw") : document.getElementById("canvasH")
+        const svg = flag ? document.getElementById("draw") : document.getElementById("canvasV")
         const array = JSON.parse(box)
         
         console.log(array)
@@ -175,14 +176,20 @@ const ImageClassificationPage = (props: Props) => {
     }
 
     function addHistory() {
-        const canvasH = document.getElementById("canvasH")
+
+        const boxElement = document.createElement("div") as HTMLElement
+        boxElement.setAttribute('class', 'flex flex-col gap-2')
+        const canvasH = document.getElementById("canvasV")
         const imgClone = document.getElementById("draw")
-        var newImg = imgClone?.cloneNode(true)
+        var newImg = imgClone?.cloneNode(true) as HTMLElement
+        newImg.setAttribute('id', 'drawH')
+        newImg.setAttribute('class', 'relative')
         var img = (newImg?.firstChild) as HTMLElement
         img.setAttribute('width', '400')
         img.setAttribute('height', '400')
 
-        canvasH?.append(newImg!)
+        boxElement?.append(newImg!)
+        canvasH?.append(boxElement!)
 
     }
 
