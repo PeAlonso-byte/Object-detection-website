@@ -60,6 +60,9 @@ const ImageClassificationPage = (props: Props) => {
                     }
                 </Button>
             </form>
+            {
+                label && <p id='rLabel' className='font-bold text-l text-red-600'>{label}</p>
+            }
             { url && (<>
                 <div id="draw" className='relative '>
                     <Image src={url} width={width} height={height} alt={'uploaded image'} /> 
@@ -68,9 +71,7 @@ const ImageClassificationPage = (props: Props) => {
                     href={url}/>
             </>
             )}
-            {
-                label && <p className='font-bold text-l text-green-600'>{label}</p>
-            }
+            
 
             <div id="canvasH" className='relative gap-2'>
                 <div id="canvasV" className='flex gap-2'></div>
@@ -180,15 +181,19 @@ const ImageClassificationPage = (props: Props) => {
         const boxElement = document.createElement("div") as HTMLElement
         boxElement.setAttribute('class', 'flex flex-col gap-2')
         const canvasH = document.getElementById("canvasV")
+        const rLabel = document.getElementById("rLabel")
         const imgClone = document.getElementById("draw")
         var newImg = imgClone?.cloneNode(true) as HTMLElement
+        var rLabelClone = rLabel?.cloneNode(true) as HTMLElement
         newImg.setAttribute('id', 'drawH')
         newImg.setAttribute('class', 'relative')
         var img = (newImg?.firstChild) as HTMLElement
         img.setAttribute('width', '400')
         img.setAttribute('height', '400')
 
+        boxElement?.append(rLabelClone!)
         boxElement?.append(newImg!)
+        
         canvasH?.append(boxElement!)
 
     }
