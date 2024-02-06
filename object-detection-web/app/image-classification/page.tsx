@@ -80,6 +80,8 @@ const ImageClassificationPage = (props: Props) => {
     )
 
     /** Handler functions */
+  
+    
     
     async function uploadFiles (event : any) {
         event.preventDefault()
@@ -193,6 +195,11 @@ const ImageClassificationPage = (props: Props) => {
 
         boxElement?.append(rLabelClone!)
         boxElement?.append(newImg!)
+        boxElement.onclick = ((e) => {
+            const obj = e.target as HTMLElement
+            
+            console.log(obj.parentNode)
+        })
         
         canvasH?.append(boxElement!)
 
