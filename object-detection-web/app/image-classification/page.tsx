@@ -74,7 +74,7 @@ const ImageClassificationPage = (props: Props) => {
             
 
             <div id="canvasH" className='relative gap-2'>
-                <div id="canvasV" className='flex gap-2'></div>
+                <div id="canvasV" className='flex gap-2 overflow-x-scroll snap-x justify-center pb-4'></div>
             </div>
         </main>
     )
@@ -181,7 +181,7 @@ const ImageClassificationPage = (props: Props) => {
     function addHistory() {
 
         const boxElement = document.createElement("div") as HTMLElement
-        boxElement.setAttribute('class', 'flex flex-col gap-2')
+        boxElement.setAttribute('class', 'shrink-0 gap-2 snap-center')
         const canvasH = document.getElementById("canvasV")
         const rLabel = document.getElementById("rLabel")
         const imgClone = document.getElementById("draw")
