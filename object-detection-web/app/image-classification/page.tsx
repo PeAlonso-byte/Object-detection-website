@@ -86,7 +86,6 @@ const ImageClassificationPage = (props: Props) => {
     async function uploadFiles (event : any) {
         event.preventDefault()
         const svg = document.getElementById("draw")
-
         if (svg) {
             document.getElementById("draw")?.querySelectorAll('[name="boxes"]').forEach(e => e.remove())
         } else {
@@ -94,7 +93,7 @@ const ImageClassificationPage = (props: Props) => {
         }
         const file = event.target[0].files[0]
         const url = URL.createObjectURL(file)
-
+        
         const img = new (window as any).Image()
         img.src = url
         
@@ -109,6 +108,14 @@ const ImageClassificationPage = (props: Props) => {
             setWidth(img.width)
             setHeight(img.height)
             setUrl(response.data.url)
+
+            if (svg) {
+                const mainImg = svg.childNodes[0] as HTMLImageElement
+                mainImg.src = response.data.url
+                mainImg.srcset = response.data.url
+                mainImg.width = img.width
+                mainImg.height = img.height
+            }
             setLabel(formatLabel(response.data.label))
             box = response.data.box
             setTimeout(() => {
@@ -143,8 +150,6 @@ const ImageClassificationPage = (props: Props) => {
         setColors(['red', 'purple', 'hotpink', 'blue', 'cyan', 'green', 'orange']) 
         const svg = flag ? document.getElementById("draw") : document.getElementById("canvasV")
         const array = JSON.parse(box)
-        
-        console.log(array)
         array.map((box: any) => {
             const color =
             "#" +
@@ -153,6 +158,7 @@ const ImageClassificationPage = (props: Props) => {
               .padStart(6, '0');
             const boxElement = document.createElement("div");
             boxElement.setAttribute("name", "boxes")
+            boxElement.setAttribute("id", "boxes")
             Object.assign(boxElement.style, {
                 zIndex: "99",
                 borderWidth: "2px",
@@ -197,7 +203,10 @@ const ImageClassificationPage = (props: Props) => {
         boxElement?.append(newImg!)
         boxElement.onclick = ((e) => {
             const obj = e.target as HTMLElement
-            const parentObject = obj.parentElement?.id == 'drawH' ? obj.parentElement.parentElement : obj.parentElement
+            let parentObject = obj.parentElement?.id == 'drawH' ? obj.parentElement.parentElement : obj.parentElement
+            if (parentObject?.id == 'boxes') {
+                parentObject = parentObject.parentElement?.parentElement!
+            }
             const mainImg = parentObject?.childNodes[1].childNodes[0] as HTMLImageElement
             const mainDiv = document.getElementById("draw")
             const imgWidth = mainImg.naturalWidth
@@ -209,9 +218,6 @@ const ImageClassificationPage = (props: Props) => {
             clonedDivChild.setAttribute('id', 'draw')
             clonedImg.setAttribute('height', `${imgHeight}`)
             clonedImg.setAttribute('width', `${imgWidth}`)
-            
-            console.log(clonedDiv.childNodes[1])
-            console.log(mainDiv)
             mainDiv?.replaceWith(clonedDiv.childNodes[1])
             setLabel(clonedDiv.childNodes[0].textContent!)
             
