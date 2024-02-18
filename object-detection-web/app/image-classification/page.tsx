@@ -74,7 +74,7 @@ const ImageClassificationPage = (props: Props) => {
             
 
             <div id="canvasH" className='relative gap-2'>
-                <div id="canvasV" className='flex gap-2 overflow-x-scroll snap-x justify-center pb-4'></div>
+                <div id="canvasV" className='flex gap-2 overflow-x-scroll snap-x pb-4'></div>
             </div>
         </main>
     )
@@ -181,7 +181,7 @@ const ImageClassificationPage = (props: Props) => {
     function addHistory() {
 
         const boxElement = document.createElement("div") as HTMLElement
-        boxElement.setAttribute('class', 'shrink-0 gap-2 snap-center')
+        boxElement.setAttribute('class', 'shrink-0 gap-2')
         const canvasH = document.getElementById("canvasV")
         const rLabel = document.getElementById("rLabel")
         const imgClone = document.getElementById("draw")
@@ -197,8 +197,25 @@ const ImageClassificationPage = (props: Props) => {
         boxElement?.append(newImg!)
         boxElement.onclick = ((e) => {
             const obj = e.target as HTMLElement
+            const parentObject = obj.parentElement?.id == 'drawH' ? obj.parentElement.parentElement : obj.parentElement
+            const mainImg = parentObject?.childNodes[1].childNodes[0] as HTMLImageElement
+            const mainDiv = document.getElementById("draw")
+            const imgWidth = mainImg.naturalWidth
+            const imgHeight = mainImg.naturalHeight
+
+            const clonedDiv = parentObject?.cloneNode(true) as HTMLElement
+            const clonedDivChild = clonedDiv.childNodes[1] as HTMLElement
+            const clonedImg = clonedDiv.childNodes[1].childNodes[0] as HTMLImageElement
+            clonedDivChild.setAttribute('id', 'draw')
+            clonedImg.setAttribute('height', `${imgHeight}`)
+            clonedImg.setAttribute('width', `${imgWidth}`)
             
-            console.log(obj.parentNode)
+            console.log(clonedDiv.childNodes[1])
+            console.log(mainDiv)
+            mainDiv?.replaceWith(clonedDiv.childNodes[1])
+            setLabel(clonedDiv.childNodes[0].textContent!)
+            
+
         })
         
         canvasH?.append(boxElement!)
